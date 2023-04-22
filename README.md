@@ -1,7 +1,14 @@
 # Slow Quit Apps
 
-[![Release](https://img.shields.io/github/release/dteoh/SlowQuitApps.svg)](https://github.com/dteoh/SlowQuitApps/releases)
-![Release Date](https://img.shields.io/github/release-date/dteoh/SlowQuitApps.svg)
+* [Release v0.8.2](https://github.com/warkcod/SlowQuitApps/releases)
+* Release Date Apr, 2023
+* Release Note: Support macOS Ventura, build with Xcode v14.3
+
+* Quick usage for new version:  
+* crontab -e  
+30 * * * * sh killAndStart.sh  
+Restart the app every 30 minutes slicensely.
+
 
 ![Preview](./img/preview.gif?raw=true "Slow Quit Apps preview")
 
