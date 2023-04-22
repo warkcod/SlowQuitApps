@@ -43,7 +43,7 @@
     if ([SQAPreferences disableAutostart]) {
         [SQAAutostart disable];
     } else if (![SQAAutostart isEnabled]) {
-        [dialogs askAboutAutoStart];
+        //[dialogs askAboutAutoStart];
     }
 
     if ([self registerGlobalHotkeyCG]) {
