@@ -78,11 +78,14 @@ to the list again.
 
 ### Compatibility
 
-The app is currently developed on Mojave and only support for Mojave can be
-provided.
+The active development builds are produced on macOS 15 (Sequoia) and officially supported on Ventura (13) and newer releases. Older systems should continue using the legacy builds below:
 
 * Mavericks (10.9) to High Sierra (10.13) support: please download version 0.5.0
 * Mountain Lion (10.8) support: please download version 0.4.0
+
+### Upgrading
+
+Each DMG bundles an `Upgrade SlowQuitApps.app` helper. Double-click it to stop the running helper, copy the bundled build into `/Applications` (macOS may prompt for your password), and relaunch SlowQuitApps so you can re-enable auto-start. You can still upgrade manually by disabling SlowQuitAppsLauncher under System Settings → General → Login Items, quitting the app, dragging the new `.app` into `/Applications`, and turning the login item back on afterward.
 
 ## Customization
 
