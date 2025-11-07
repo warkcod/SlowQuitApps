@@ -49,6 +49,10 @@
     if ([SQAPreferences disableAutostart]) {
         [SQAAutostart disable];
         [dialogs informAutoStartDisabled];
+    } else if ([SQAPreferences pendingAutoEnable]) {
+        if (![SQAAutostart enable]) {
+            [dialogs informLoginItemRegistrationFailure];
+        }
     } else if (![SQAAutostart isEnabled]) {
         [dialogs askAboutAutoStart];
     }

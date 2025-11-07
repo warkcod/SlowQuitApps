@@ -127,7 +127,6 @@ CONSOLE_UID=$(id -u "$CONSOLE_USER")
 echo "== SlowQuitApps Upgrade Assistant =="
 echo ""
 echo "Stopping running instances..."
-sudo -u "$CONSOLE_USER" defaults write com.dteoh.SlowQuitApps disableAutostart -bool YES >/dev/null 2>&1 || true
 pkill -x SlowQuitApps >/dev/null 2>&1 || true
 pkill -x SlowQuitAppsLauncher >/dev/null 2>&1 || true
 launchctl bootout gui/${CONSOLE_UID}/com.dteoh.SlowQuitAppsLauncher >/dev/null 2>&1 || true
@@ -138,11 +137,17 @@ rm -rf "$DST_PATH"
 ditto "$SRC_PATH" "$DST_PATH"
 
 echo ""
+echo "Requesting auto-start re-enable on next launch..."
+sudo -u "$CONSOLE_USER" defaults delete com.dteoh.SlowQuitApps disableAutostart >/dev/null 2>&1 || true
+sudo -u "$CONSOLE_USER" defaults write com.dteoh.SlowQuitApps disableAutostart -bool NO >/dev/null 2>&1
+sudo -u "$CONSOLE_USER" defaults write com.dteoh.SlowQuitApps pendingAutoEnable -bool YES >/dev/null 2>&1
+
+echo ""
 echo "Relaunching SlowQuitApps..."
 sudo -u "$CONSOLE_USER" open "$DST_PATH"
 
 echo ""
-echo "Upgrade complete. You can re-enable auto-start from SlowQuitApps if needed."
+echo "Upgrade complete. Auto-start will be re-enabled automatically on next launch."
 SCRIPT
 chmod +x "${UPGRADE_APP}/Contents/Resources/upgrade-helper.sh"
 
@@ -156,7 +161,7 @@ Install:
 2. Launch the app, grant Accessibility permissions, and enable auto-start if desired.
 
 Upgrade:
-1. Double-click "Upgrade SlowQuitApps.app". It stops running helpers, copies this build into /Applications (macOS may prompt for your password), and relaunches the updated app.
+1. Double-click "Upgrade SlowQuitApps.app". It stops running helpers, copies this build into /Applications (macOS may prompt for your password), and relaunches the updated app with auto-start queued to re-enable automatically.
 2. Alternatively, disable SlowQuitAppsLauncher in System Settings → General → Login Items, quit SlowQuitApps, replace the .app manually, then re-enable auto-start.
 DOC
 

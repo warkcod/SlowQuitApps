@@ -11,7 +11,8 @@
                                  @"whitelist": @[],
                                  @"invertList": @NO,
                                  @"displayOverlay": @YES,
-                                 @"disableAutostart": @NO
+                                 @"disableAutostart": @NO,
+                                 @"pendingAutoEnable": @NO
                                  };
       [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
         defaultsRegistered = YES;
@@ -56,6 +57,18 @@
 
 + (BOOL)disableAutostart {
     return [[self defaults] boolForKey:@"disableAutostart"];
+}
+
++ (void)setDisableAutostart:(BOOL)value {
+    [[self defaults] setBool:value forKey:@"disableAutostart"];
+}
+
++ (BOOL)pendingAutoEnable {
+    return [[self defaults] boolForKey:@"pendingAutoEnable"];
+}
+
++ (void)setPendingAutoEnable:(BOOL)value {
+    [[self defaults] setBool:value forKey:@"pendingAutoEnable"];
 }
 
 @end

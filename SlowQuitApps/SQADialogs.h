@@ -6,6 +6,7 @@
 - (void)informHotkeyRegistrationFailure;
 - (void)informAccessibilityRequirement;
 - (void)informMoveToApplicationsRequirement;
+- (void)informLoginItemRegistrationFailure;
 - (void)informAutoStartDisabled;
 - (void)promptToReEnableAutoStart;
 

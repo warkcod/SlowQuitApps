@@ -85,7 +85,7 @@ The active development builds are produced on macOS 15 (Sequoia) and officially 
 
 ### Upgrading
 
-Each DMG bundles an `Upgrade SlowQuitApps.app` helper. Double-click it to stop the running helper, copy the bundled build into `/Applications` (macOS may prompt for your password), and relaunch SlowQuitApps so you can re-enable auto-start. You can still upgrade manually by disabling SlowQuitAppsLauncher under System Settings → General → Login Items, quitting the app, dragging the new `.app` into `/Applications`, and turning the login item back on afterward.
+Each DMG bundles an `Upgrade SlowQuitApps.app` helper. Double-click it to stop the running helper, copy the bundled build into `/Applications` (macOS may prompt for your password), and relaunch SlowQuitApps with auto-start automatically re-enabled. You can still upgrade manually by disabling SlowQuitAppsLauncher under System Settings → General → Login Items, quitting the app, dragging the new `.app` into `/Applications`, and turning the login item back on afterward.
 
 ## Customization
 

@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import "SQAPreferences.h"
 @import ServiceManagement;
 #import "SQAAutostart.h"
 
@@ -66,11 +67,20 @@ NSString * const LauncherBundleIdentifier = @"com.dteoh.SlowQuitAppsLauncher";
 
 
 + (BOOL)enable {
-    return [self shouldRegisterLoginItem:YES];
+    BOOL result = [self shouldRegisterLoginItem:YES];
+    if (result) {
+        [SQAPreferences setDisableAutostart:NO];
+        [SQAPreferences setPendingAutoEnable:NO];
+    }
+    return result;
 }
 
 + (BOOL)disable {
-    return [self shouldRegisterLoginItem:NO];
+    BOOL result = [self shouldRegisterLoginItem:NO];
+    if (result) {
+        [SQAPreferences setDisableAutostart:YES];
+    }
+    return result;
 }
 
 + (BOOL)isRunningFromReadOnlyLocation {
