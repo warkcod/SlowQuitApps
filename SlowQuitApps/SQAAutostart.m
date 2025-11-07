@@ -19,24 +19,16 @@ NSString * const LauncherBundleIdentifier = @"com.dteoh.SlowQuitAppsLauncher";
         NSError *error = nil;
         if(enabled) {
             BOOL result = [SMAppService.mainAppService registerAndReturnError:&error];
-//            NSLog(@"Registration failed: %@", error.localizedDescription);
-            
-            NSAlert *warning = [[NSAlert alloc] init];
-            warning.alertStyle = NSAlertStyleWarning;
-            if (result) {
-                warning.messageText = NSLocalizedString(@"Success", nil);
-                warning.informativeText = error.localizedDescription;
-            } else {
-                warning.messageText = NSLocalizedString(@"Failed", nil);
-                warning.informativeText = error.localizedDescription;
+            if (!result && error) {
+                NSLog(@"Failed to register login item: %@", error.localizedDescription);
             }
-           
-            [warning addButtonWithTitle:NSLocalizedString(@"OK", nil)];
-            [warning runModal];
-            
             return result;
         } else {
-            return [SMAppService.mainAppService unregisterAndReturnError:&error];
+            BOOL result = [SMAppService.mainAppService unregisterAndReturnError:&error];
+            if (!result && error) {
+                NSLog(@"Failed to unregister login item: %@", error.localizedDescription);
+            }
+            return result;
         }
     } else {
         return SMLoginItemSetEnabled((__bridge CFStringRef)(LauncherBundleIdentifier), enabled);
