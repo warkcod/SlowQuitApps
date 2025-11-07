@@ -55,11 +55,7 @@
 }
 
 + (BOOL)disableAutostart {
-    static BOOL disableAutostart;
-    if (!disableAutostart) {
-        disableAutostart = [[self defaults] boolForKey:@"disableAutostart"];
-    }
-    return disableAutostart;
+    return [[self defaults] boolForKey:@"disableAutostart"];
 }
 
 @end

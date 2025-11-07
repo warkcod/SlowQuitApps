@@ -48,6 +48,7 @@
 
     if ([SQAPreferences disableAutostart]) {
         [SQAAutostart disable];
+        [dialogs informAutoStartDisabled];
     } else if (![SQAAutostart isEnabled]) {
         [dialogs askAboutAutoStart];
     }

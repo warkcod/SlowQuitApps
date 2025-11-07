@@ -87,10 +87,35 @@
     NSString *bundlePath = [NSBundle mainBundle].bundlePath ?: @"";
     NSAlert *alert = [[NSAlert alloc] init];
     alert.alertStyle = NSAlertStyleWarning;
-    alert.messageText = NSLocalizedString(@"请先将 SlowQuitApps 拖到“应用程序”文件夹", nil);
-    alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"当前应用正从只读磁盘映像运行（%@）。\n\nmacOS 不允许从只读卷注册登录项，请先将 SlowQuitApps.app 拖到 /Applications ，再重新启用自动启动。", nil), bundlePath];
-    [alert addButtonWithTitle:NSLocalizedString(@"知道了", nil)];
+    alert.messageText = NSLocalizedString(@"Move SlowQuitApps to the Applications folder first", nil);
+    alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"The app is currently running from a read-only disk image (%@).\n\nmacOS does not allow login items to register from read-only volumes. Please drag SlowQuitApps.app into /Applications and relaunch it before enabling auto-start.", nil), bundlePath];
+    [alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
     [alert runModal];
+}
+
+- (void)informAutoStartDisabled {
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.alertStyle = NSAlertStyleInformational;
+    alert.messageText = NSLocalizedString(@"Automatic launch is currently disabled", nil);
+    alert.informativeText = NSLocalizedString(@"SlowQuitApps previously turned off auto-start (for example during an upgrade). Click “Enable auto-start” below to re-register the login item so the app launches at login again.", nil);
+    [alert addButtonWithTitle:NSLocalizedString(@"Enable auto-start", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"Later", nil)];
+    if ([alert runModal] == NSAlertFirstButtonReturn) {
+        [self promptToReEnableAutoStart];
+    }
+}
+
+- (void)promptToReEnableAutoStart {
+    if ([SQAAutostart enable]) {
+        NSAlert *success = [[NSAlert alloc] init];
+        success.alertStyle = NSAlertStyleInformational;
+        success.messageText = NSLocalizedString(@"Auto-start has been re-enabled", nil);
+        success.informativeText = NSLocalizedString(@"If macOS prompts you to allow SlowQuitAppsLauncher in System Settings → General → Login Items, please set it to “Allow in the Background”.", nil);
+        [success addButtonWithTitle:NSLocalizedString(@"OK", nil)];
+        [success runModal];
+    } else {
+        [self informLoginItemRegistrationFailure];
+    }
 }
 
 @end
