@@ -14,11 +14,7 @@
         return;
     }
 
-    if ([self registerLoginItem]) {
-        return;
-    }
-
-    [self informLoginItemRegistrationFailure];
+    [self registerLoginItem];
 }
 
 - (void)informLoginItemRegistrationFailure {
