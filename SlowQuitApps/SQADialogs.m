@@ -1,3 +1,4 @@
+@import AppKit;
 #import "SQADialogs.h"
 #import "SQAAutostart.h"
 
@@ -14,15 +15,32 @@
         return;
     }
 
-    [self registerLoginItem];
+    BOOL result = [self registerLoginItem];
+
+    if (!result) {
+        [self informLoginItemRegistrationFailure];
+    }
 }
 
 - (void)informLoginItemRegistrationFailure {
     NSAlert *warning = [[NSAlert alloc] init];
     warning.alertStyle = NSAlertStyleWarning;
-    warning.messageText = NSLocalizedString(@"Failed to register SlowQuitApps to launch on login", nil);
-    [warning addButtonWithTitle:NSLocalizedString(@"OK", nil)];
-    [warning runModal];
+    warning.messageText = NSLocalizedString(@"Manual action required to enable auto-start", nil);
+
+    NSString *detail = NSLocalizedString(
+        @"macOS 13+ requires approving login items before they can run in the background.\n\n"
+        "Click “Open Login Items” below to jump straight to System Settings.\n"
+        "In “Allow in the Background”, toggle “SlowQuitAppsLauncher” to Allow.\n\n"
+        "This is an Apple security requirement introduced in macOS 13 (Ventura).\n\n"
+        "For more help, visit: https://github.com/warkcod/SlowQuitApps", nil);
+
+    warning.informativeText = detail;
+    [warning addButtonWithTitle:NSLocalizedString(@"Open Login Items", nil)];
+    [warning addButtonWithTitle:NSLocalizedString(@"Close", nil)];
+
+    if ([warning runModal] == NSAlertFirstButtonReturn) {
+        [self openLoginItemsPreferences];
+    }
 }
 
 - (BOOL)registerLoginItem {
@@ -45,6 +63,15 @@
     alert.informativeText = NSLocalizedString(@"SlowQuitApps needs accessibility permissions to handle ⌘Q.\r\rAfter adding SlowQuitApps to System Preferences -> Security & Privacy -> Privacy -> Accessibility, please restart the app.", nil);
     [alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
     [alert runModal];
+}
+
+- (void)openLoginItemsPreferences {
+    NSURL *loginItemsURL = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.LoginItems-Settings.extension"];
+    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+    if (![workspace openURL:loginItemsURL]) {
+        NSURL *fallbackURL = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.users"];
+        [workspace openURL:fallbackURL];
+    }
 }
 
 @end
