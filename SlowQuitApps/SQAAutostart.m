@@ -1,3 +1,4 @@
+#import <Foundation/Foundation.h>
 @import ServiceManagement;
 #import "SQAAutostart.h"
 
@@ -34,6 +35,11 @@ NSString * const LauncherBundleIdentifier = @"com.dteoh.SlowQuitAppsLauncher";
 + (BOOL)shouldRegisterLoginItem:(BOOL)enabled {
     // macOS 13+ requires SMAppService - SMLoginItemSetEnabled is no longer effective
     if (@available(macOS 13.0, *)) {
+        if ([self isRunningFromReadOnlyLocation]) {
+            NSLog(@"Cannot register login item while SlowQuitApps is running from a read-only volume. Please move the app to /Applications first.");
+            return NO;
+        }
+
         NSError *error = nil;
         SMAppService *service = [self launcherService];
         if (enabled) {
@@ -65,6 +71,20 @@ NSString * const LauncherBundleIdentifier = @"com.dteoh.SlowQuitAppsLauncher";
 
 + (BOOL)disable {
     return [self shouldRegisterLoginItem:NO];
+}
+
++ (BOOL)isRunningFromReadOnlyLocation {
+    NSURL *bundleURL = [NSBundle mainBundle].bundleURL;
+    if (!bundleURL) { return NO; }
+
+    NSNumber *readOnly = nil;
+    [bundleURL getResourceValue:&readOnly forKey:NSURLVolumeIsReadOnlyKey error:nil];
+    if (readOnly.boolValue) {
+        return YES;
+    }
+
+    NSString *bundlePath = bundleURL.path;
+    return [bundlePath hasPrefix:@"/Volumes/"];
 }
 
 

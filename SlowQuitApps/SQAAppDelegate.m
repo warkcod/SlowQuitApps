@@ -33,6 +33,12 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     SQADialogs *dialogs = [[SQADialogs alloc] init];
 
+    if ([SQAAutostart isRunningFromReadOnlyLocation]) {
+        [dialogs informMoveToApplicationsRequirement];
+        [NSApp terminate:nil];
+        return;
+    }
+
     if (!hasAccessibility()) {
         [dialogs informAccessibilityRequirement];
         // If we terminate now, the special accesibility alert/dialog

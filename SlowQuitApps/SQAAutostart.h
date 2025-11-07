@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isEnabled;
 + (BOOL)enable;
 + (BOOL)disable;
++ (BOOL)isRunningFromReadOnlyLocation;
 
 @end
 

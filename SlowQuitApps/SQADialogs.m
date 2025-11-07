@@ -15,11 +15,20 @@
         return;
     }
 
+    if ([SQAAutostart isRunningFromReadOnlyLocation]) {
+        [self informMoveToApplicationsRequirement];
+        return;
+    }
+
     BOOL result = [self registerLoginItem];
 
-    if (!result) {
-        [self informLoginItemRegistrationFailure];
+    if (result) {
+        // Success: silently complete
+        return;
     }
+
+    // Failure: must inform user and provide solution!
+    [self informLoginItemRegistrationFailure];
 }
 
 - (void)informLoginItemRegistrationFailure {
@@ -72,6 +81,16 @@
         NSURL *fallbackURL = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.users"];
         [workspace openURL:fallbackURL];
     }
+}
+
+- (void)informMoveToApplicationsRequirement {
+    NSString *bundlePath = [NSBundle mainBundle].bundlePath ?: @"";
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.alertStyle = NSAlertStyleWarning;
+    alert.messageText = NSLocalizedString(@"请先将 SlowQuitApps 拖到“应用程序”文件夹", nil);
+    alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"当前应用正从只读磁盘映像运行（%@）。\n\nmacOS 不允许从只读卷注册登录项，请先将 SlowQuitApps.app 拖到 /Applications ，再重新启用自动启动。", nil), bundlePath];
+    [alert addButtonWithTitle:NSLocalizedString(@"知道了", nil)];
+    [alert runModal];
 }
 
 @end
