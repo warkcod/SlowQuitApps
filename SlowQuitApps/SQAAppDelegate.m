@@ -6,10 +6,13 @@
 #import "SQAStateMachine.h"
 #import "SQAAutostart.h"
 
+static const NSTimeInterval SQAStartupOverlayDuration = 3.0;
+
 @interface SQAAppDelegate() {
 @private
     SQAStateMachine *stateMachine;
     id<SQAOverlayViewInterface> overlayView;
+    id<SQAOverlayViewInterface> startupOverlay;
     CFMachPortRef eventTapPort;
     CFRunLoopSourceRef eventRunLoop;
     CGEventSourceRef appEventSource;
@@ -61,6 +64,7 @@
         // Hide from dock, command tab, etc.
         // Not using LSBackgroundOnly so that we can display NSAlerts beforehand
         [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
+        [self showStartupOverlay];
     } else {
         [dialogs informHotkeyRegistrationFailure];
         [NSApp terminate:self];
@@ -91,12 +95,12 @@
 
     CFRunLoopSourceRef runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, port, 0);
     CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
-    CGEventTapEnable(port, true);
-    CFRunLoopRun();
-
     eventTapPort = port;
     eventRunLoop = runLoopSource;
     appEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
+
+    CGEventTapEnable(port, true);
+    CFRunLoopRun();
 
     return true;
 }
@@ -173,6 +177,29 @@
     return appEventSource;
 }
 
+- (void)showStartupOverlay {
+    NSString *startupMessage = NSLocalizedString(@"SQA_STARTUP_MESSAGE", @"Startup overlay message");
+
+    id<SQAOverlayViewInterface> overlay = [[SQAOverlayWindowController alloc] init];
+    startupOverlay = overlay;
+    [overlay showOverlay:SQAStartupOverlayDuration withTitle:startupMessage];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SQAStartupOverlayDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [overlay hideOverlay];
+        [overlay resetOverlay];
+        if (startupOverlay == overlay) {
+            startupOverlay = nil;
+        }
+    });
+}
+
+- (void)reenableEventTap {
+    if (!eventTapPort) {
+        return;
+    }
+    CGEventTapEnable(eventTapPort, true);
+}
+
 - (BOOL)shouldHandleCmdQ {
     if (appSwitcherActive) {
         return NO;
@@ -209,10 +236,16 @@ BOOL hasAccessibility() {
 }
 
 CGEventRef eventTapHandler(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *userInfo) {
+    SQAAppDelegate *delegate = (__bridge SQAAppDelegate *)userInfo;
+
+    if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
+        [delegate reenableEventTap];
+        return event;
+    }
+
     if (type != kCGEventFlagsChanged && type != kCGEventKeyDown && type != kCGEventKeyUp) {
         return event;
     }
-    SQAAppDelegate *delegate = (__bridge SQAAppDelegate *)userInfo;
 
     NSString *stringedKey = stringFromCGKeyboardEvent(event);
 
